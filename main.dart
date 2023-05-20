@@ -1,102 +1,93 @@
 import 'package:flutter/material.dart';
+import 'package:my_app/screens/apps_screen.dart';
+import 'package:my_app/screens/cart_screen.dart';
+import 'package:my_app/screens/home_screen.dart';
+import 'package:my_app/screens/product_screen.dart';
+import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
 
-void main() => runApp(MyApp());
+void main() => runApp (const MyApp());
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'My App',
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('My App'),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.menu),
-              onPressed: () {
-                // Handle slide more option
-              },
-            ),
-            IconButton(
-              icon: const Icon(Icons.notifications),
-              onPressed: () {
-                // Handle notification option
-              },
-            ),
-            IconButton(
-              icon: const Icon(Icons.account_circle),
-              onPressed: () {
-                // Handle account option
-              },
-            ),
-          ],
-        ),
-        body: Column(
-          children: [
-            Container(
-              margin: const EdgeInsets.all(20),
-              child: const TextField(
-                decoration: InputDecoration(
-                  hintText: 'Search',
-                  prefixIcon: Icon(Icons.search),
-                  border: OutlineInputBorder(),
-                ),
-              ),
-            ),
-            Expanded(
-              child: GridView.count(
-                crossAxisCount: 2,
-                children: List.generate(
-                  6,
-                      (index) => Card(
-                    child: Center(
-                      child: Text('Poster ${index + 1}'),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-        bottomNavigationBar: BottomAppBar(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              IconButton(
-                icon: const Icon(Icons.home),
-                onPressed: () {
-                  // Handle home option
-                },
-              ),
-              IconButton(
-                icon: const Icon(Icons.shopping_cart),
-                onPressed: () {
-                  // Handle products option
-                },
-              ),
-              IconButton(
-                icon: const Icon(Icons.apps),
-                onPressed: () {
-                  // Handle cart option
-                },
-              ),
-              PopupMenuButton<String>(
-                onSelected: (value) {
-                  // Handle more option
-                },
-                itemBuilder: (BuildContext context) {
-                  return [
-                    const PopupMenuItem<String>(
-                      value: 'more',
-                      child: Text('More'),
-                    ),
-                  ];
-                },
-              ),
-            ],
-          ),
-        ),
-      ),
+    return const MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home:  BottomNavBar(),
     );
   }
 }
+
+class BottomNavBar extends StatelessWidget {
+  const BottomNavBar({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    List<Widget> buildScreens() {
+      return [
+        const Home(),
+        const Product(),
+        const Cart(),
+        const Apps()
+      ];
+    }
+    List<PersistentBottomNavBarItem> navBarsItems() {
+      return [
+        PersistentBottomNavBarItem(
+          icon: const Icon(Icons.home),
+          activeColorPrimary: Colors.orange,
+          inactiveColorPrimary: Colors.grey,
+        ),
+        PersistentBottomNavBarItem(
+          icon: const Icon(Icons.card_giftcard),
+          activeColorPrimary: Colors.orange,
+          inactiveColorPrimary: Colors.grey,
+        ),
+        PersistentBottomNavBarItem(
+          icon: const Icon(Icons.shopping_cart),
+          activeColorPrimary: Colors.orange,
+          inactiveColorPrimary: Colors.grey,
+        ),
+        PersistentBottomNavBarItem(
+          icon: const Icon(Icons.apps),
+          activeColorPrimary: Colors.orange,
+          inactiveColorPrimary: Colors.grey,
+        ),
+      ];
+    }
+    PersistentTabController controller;
+
+    controller = PersistentTabController(initialIndex: 0);
+
+    return PersistentTabView(
+      context,
+      controller: controller,
+      screens: buildScreens(),
+      items: navBarsItems(),
+      confineInSafeArea: true,
+      backgroundColor: Colors.white70, // Default is Colors.white.
+      handleAndroidBackButtonPress: true, // Default is true.
+      resizeToAvoidBottomInset: true, // This needs to be true if you want to move up the screen when keyboard appears. Default is true.
+      stateManagement: true, // Default is true.
+      hideNavigationBarWhenKeyboardShows: true, // Recommended to set 'resizeToAvoidBottomInset' as true while using this argument. Default is true.
+      decoration: NavBarDecoration(
+        borderRadius: BorderRadius.circular(10.0),
+        colorBehindNavBar: Colors.grey,
+      ),
+      popAllScreensOnTapOfSelectedTab: true,
+      popActionScreens: PopActionScreensType.all,
+      itemAnimationProperties: const ItemAnimationProperties( // Navigation Bar's items animation properties.
+        duration: Duration(milliseconds: 200),
+        curve: Curves.ease,
+      ),
+      screenTransitionAnimation: const ScreenTransitionAnimation( // Screen transition animation on change of selected tab.
+        animateTabTransition: true,
+        curve: Curves.ease,
+        duration: Duration(milliseconds: 200),
+      ),
+      navBarStyle: NavBarStyle.style1, // Choose the nav bar style with this property.
+    );
+  }
+}
+
